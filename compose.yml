@@ -1,0 +1,39 @@
+services:
+  web:
+    build: apache
+    ports:
+      - 80:80
+    volumes:
+      - ./apache/tarefa1.conf:/etc/apache2/sites-enabled/tarefa1.conf
+      - ./apache/tarefa3.conf:/etc/apache2/sites-enabled/tarefa3.conf
+      - ./exemplo.lan/htdocs:/opt/web/exemplo.lan/htdocs
+      - ./exemplo.lan/datos:/opt/web/exemplo.lan/datos
+      - ./omeusitio.lan/htdocs:/opt/web/omeusitio.lan/htdocs
+    networks:
+      redeapache:
+        ipv4_address: 192.168.58.11
+        aliases:
+          - www.exemplo.lan
+          - exemplo.lan
+          - eq1.exemplo.lan
+          - www.omeusitio.lan
+          - omeusitio.lan
+    develop:
+      watch:
+        - path: ./apache/test1.conf
+          action: restart
+  cliente:
+    image: brunosct/debian12-cliente-firefox
+    hostname: cliente
+    networks:
+      redeapache:
+        ipv4_address: 192.168.58.100
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+networks:
+  redeapache:
+    ipam:
+      config:
+        - subnet: 192.168.58.0/24
